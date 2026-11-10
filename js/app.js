@@ -193,8 +193,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     updateProfileUI();
 
-    // PAN Y ZOOM
-    let scale = 1, panX = 0, panY = 0, isDragging = false, startX = 0, startY = 0;
+// PAN Y ZOOM (SOPORTE COMPLETO PARA PC Y DISPOSITIVOS MÓVILES)
+    let scale = 1, panX = 0, panY = 0;
+    let isDragging = false, startX = 0, startY = 0;
+    let initialPinchDistance = null, initialScale = 1;
+
     const viewport = document.getElementById('game-viewport');
     const container = document.getElementById('board-container');
 
@@ -207,6 +210,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateTransform();
     }
 
+    // Controles para PC (Rueda de ratón)
     viewport.addEventListener('wheel', (e) => {
         e.preventDefault();
         const factor = 0.1;
@@ -214,6 +218,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateTransform();
     }, { passive: false });
 
+    // Controles de arrastre para PC (Ratón)
     viewport.addEventListener('mousedown', (e) => {
         if (e.button === 0) { isDragging = true; startX = e.clientX - panX; startY = e.clientY - panY; }
     });
@@ -223,6 +228,47 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateTransform();
     });
     window.addEventListener('mouseup', () => { isDragging = false; });
+
+    // CONTROLES TÁCTILES PARA MÓVIL (iOS / Android)
+    function getDistance(touch1, touch2) {
+        const dx = touch1.clientX - touch2.clientX;
+        const dy = touch1.clientY - touch2.clientY;
+        return Math.hypot(dx, dy);
+    }
+
+    viewport.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 1) {
+            // Desplazamiento con 1 dedo
+            isDragging = true;
+            startX = e.touches[0].clientX - panX;
+            startY = e.touches[0].clientY - panY;
+        } else if (e.touches.length === 2) {
+            // Zoom con 2 dedos (Pinch to Zoom)
+            isDragging = false;
+            initialPinchDistance = getDistance(e.touches[0], e.touches[1]);
+            initialScale = scale;
+        }
+    }, { passive: false });
+
+    viewport.addEventListener('touchmove', (e) => {
+        e.preventDefault(); // Evita que la página web entera se mueva en Safari
+
+        if (e.touches.length === 1 && isDragging) {
+            panX = e.touches[0].clientX - startX;
+            panY = e.touches[0].clientY - startY;
+            updateTransform();
+        } else if (e.touches.length === 2 && initialPinchDistance) {
+            const currentDistance = getDistance(e.touches[0], e.touches[1]);
+            const factor = currentDistance / initialPinchDistance;
+            scale = Math.min(Math.max(initialScale * factor, 0.5), 2.5);
+            updateTransform();
+        }
+    }, { passive: false });
+
+    viewport.addEventListener('touchend', (e) => {
+        if (e.touches.length < 2) initialPinchDistance = null;
+        if (e.touches.length === 0) isDragging = false;
+    });
 
     document.getElementById('btn-reset-zoom').addEventListener('click', resetView);
 
