@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <!-- Viewport optimizado para iPhone 11 y dispositivos táctiles -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Mahjong Solitario Personalizado</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="theme-dark">
+
+    <!-- SPLASH SCREEN / CORTINILLA INICIAL DE CORTA CON BARRA DE CARGA -->
+<div id="splash-screen" class="splash-screen">
+    <div class="splash-content">
+        <!-- Logo de la empresa -->
+        <img src="images/logo-empresa.png" alt="Logo Empresa" id="splash-logo-img" onerror="this.src='https://api.iconify.design/emojione-v1:video-game.svg'">
+        <h2 id="splash-status-text">Inicializando recursos...</h2>
+
+        <!-- Contenedor de la barra de progreso -->
+        <div class="loader-bar-container">
+            <div id="loader-bar-fill" class="loader-bar-fill"></div>
+        </div>
+        <span id="loader-percentage">0%</span>
+    </div>
+</div>
+    <!-- BOTÓN FLOTANTE TEMA (MENÚ INICIAL) -->
+    <button id="btn-global-theme" class="btn-theme-float" title="Cambiar Tema de Interfaz">
+        <i class="fa-solid fa-palette"></i>
+    </button>
+
+    <!-- MODAL SELECCIÓN DE TEMA GLOBAL -->
+    <div id="theme-menu-modal" class="overlay hidden">
+        <div class="dialog-card">
+            <h2><i class="fa-solid fa-palette"></i> Tema de Interfaz</h2>
+            <p>Selecciona la apariencia completa del juego:</p>
+            <div class="theme-options-grid">
+                <button class="btn-theme-opt" data-theme="dark"><i class="fa-solid fa-moon"></i> Oscuro / Gris (Default)</button>
+                <button class="btn-theme-opt" data-theme="black"><i class="fa-solid fa-circle"></i> Negro Absoluto (AMOLED)</button>
+                <button class="btn-theme-opt" data-theme="light"><i class="fa-solid fa-sun"></i> Blanco / Claro</button>
+                <button class="btn-theme-opt" data-theme="blue"><i class="fa-solid fa-water"></i> Azul Océano</button>
+                <button class="btn-theme-opt" data-theme="green"><i class="fa-solid fa-tree"></i> Verde Bosque</button>
+                <button class="btn-theme-opt" data-theme="purple"><i class="fa-solid fa-wand-magic-sparkles"></i> Púrpura Neón</button>
+                <button class="btn-theme-opt" data-theme="amber"><i class="fa-solid fa-fire-flame-curved"></i> Ámbar Cálido</button>
+                <button class="btn-theme-opt" data-theme="pink"><i class="fa-solid fa-heart"></i> Rosa Pastel</button>
+                <button class="btn-theme-opt" data-theme="red"><i class="fa-solid fa-fire"></i> Rojo Crimson</button>
+            </div>
+            <button id="btn-close-theme-modal" class="btn btn-primary" style="margin-top: 15px;">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- MENÚ DE INICIO (2 COLUMNAS CON TRANSICIÓN) -->
+    <div id="start-menu" class="screen">
+        <div class="menu-layout-container">
+            
+            <!-- PERFIL JUGADOR -->
+            <aside class="profile-card">
+                <div class="profile-header">
+                    <div class="avatar-wrapper" title="Cambiar foto de perfil">
+                        <img id="user-avatar-img" src="" alt="Avatar">
+                        <div class="avatar-edit-overlay" id="btn-edit-avatar">
+                            <i class="fa-solid fa-pen"></i>
+                        </div>
+                        <input type="file" id="avatar-file-input" accept="image/*" hidden>
+                    </div>
+
+                    <div class="user-name-wrapper">
+                        <h2 id="user-name-display">Jugador 1</h2>
+                        <button id="btn-edit-name" class="btn-icon" title="Editar Nombre">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="profile-stats">
+                    <h3><i class="fa-solid fa-chart-line"></i> Estadísticas</h3>
+                    <div class="stat-item"><span>Tiempo Jugado:</span><strong id="stat-total-time">00:00:00</strong></div>
+                    <div class="stat-item"><span>Último Puntaje:</span><strong id="stat-last-score">0 pts</strong></div>
+                    <div class="stat-item"><span>Puntaje Máximo:</span><strong id="stat-max-score" style="color: var(--accent-light);">0 pts</strong></div>
+                    <div class="stat-item"><span>Puntaje Total:</span><strong id="stat-total-score">0 pts</strong></div>
+
+                    <div class="last-game-box">
+                        <h4><i class="fa-solid fa-gamepad"></i> Última Partida</h4>
+                        <p id="stat-last-details">Sin partidas recientes</p>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- CONFIGURACIÓN DE PARTIDA CON LOGO -->
+            <main class="menu-card">
+                <div class="game-logo-container">
+                    <!-- Reemplaza con el logo de tu juego -->
+                    <img src="images/logo-juego.png" alt="Logo del Juego" id="game-logo-img" onerror="this.src='https://api.iconify.design/emojione-v1:mahjong-red-dragon.svg'">
+                </div>
+                <h1>Mahjong Solitario</h1>
+                <p class="subtitle">Configura tu partida antes de empezar</p>
+
+                <div class="selector-group">
+                    <label for="difficulty-select"><i class="fa-solid fa-layer-group"></i> Dificultad / Fichas:</label>
+                    <select id="difficulty-select" class="custom-select">
+                        <option value="easy">Fácil (64 fichas)</option>
+                        <option value="medium" selected>Medio (112 fichas)</option>
+                        <option value="hard">Difícil (208 fichas)</option>
+                    </select>
+                </div>
+
+                <div class="selector-group">
+                    <label for="layout-select"><i class="fa-solid fa-grip"></i> Disposición Geométrica:</label>
+                    <select id="layout-select" class="custom-select">
+                        <option value="traditional" selected>Tradicional (Tortuga Clásica)</option>
+                        <option value="cross">Cruz Expandida (+)</option>
+                        <option value="xshape">Equis Amplia (X)</option>
+                        <option value="square">Cuadrado / Marco</option>
+                        <option value="ring">Anillo Redondo</option>
+                    </select>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="expert-mode-checkbox">
+                    <label for="expert-mode-checkbox">Modo Experto (Ocultar pistas)</label>
+                </div>
+
+                <div class="menu-actions">
+                    <button id="btn-start-game" class="btn btn-primary btn-large animated-btn">
+                        <i class="fa-solid fa-play"></i> Jugar Partida
+                    </button>
+                    <button id="btn-custom-images" class="btn btn-secondary animated-btn">
+                        <i class="fa-solid fa-images"></i> Cargar Mis Imágenes
+                    </button>
+                </div>
+            </main>
+
+        </div>
+    </div>
+
+    <!-- PANTALLA DE CARGA DE IMÁGENES -->
+    <div id="custom-screen" class="screen">
+        <div class="modal-card">
+            <h2><i class="fa-solid fa-images"></i> Personalizar Imágenes de Fichas</h2>
+            <p>Sube imágenes para tus fichas o pega URLs.</p>
+            
+            <div class="upload-zone" id="drop-zone">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                <p>Arrastra imágenes aquí o <strong>haz clic para examinar</strong></p>
+                <input type="file" id="file-input" multiple accept="image/*" hidden>
+            </div>
+
+            <div class="url-input-container">
+                <input type="url" id="url-input" placeholder="https://ejemplo.com/imagen.jpg">
+                <button id="btn-add-url" class="btn btn-secondary animated-btn">Añadir URL</button>
+            </div>
+
+            <div class="preview-grid" id="preview-grid"></div>
+
+            <div class="modal-footer">
+                <button id="btn-clear-images" class="btn btn-danger animated-btn">Borrar personalizadas</button>
+                <button id="btn-back-menu" class="btn btn-primary animated-btn">Guardar y Volver</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANTALLA DEL JUEGO -->
+    <div id="game-screen" class="screen">
+        <header class="game-header">
+            <div class="stats">
+                <div><i class="fa-solid fa-clock"></i> <span id="timer">00:00</span></div>
+                <div><i class="fa-solid fa-trophy"></i> <span id="score">0</span></div>
+                <div><i class="fa-solid fa-layer-group"></i> Fichas: <span id="tiles-left">0</span></div>
+            </div>
+
+            <div class="header-user-profile">
+                <img id="game-user-avatar" src="" alt="Jugador">
+                <span id="game-user-name">Jugador</span>
+            </div>
+
+            <div class="controls">
+                <button id="btn-reset-zoom" class="btn btn-secondary animated-btn" title="Restablecer Vista"><i class="fa-solid fa-expand"></i></button>
+                <button id="btn-game-theme" class="btn btn-secondary animated-btn" title="Cambiar Tema"><i class="fa-solid fa-palette"></i></button>
+                <button id="btn-undo" class="btn btn-secondary animated-btn" title="Deshacer"><i class="fa-solid fa-rotate-left"></i> Deshacer</button>
+                <button id="btn-shuffle" class="btn btn-secondary animated-btn" title="Mezclar"><i class="fa-solid fa-shuffle"></i> Mezclar</button>
+                <button id="btn-quit" class="btn btn-danger animated-btn" title="Menú"><i class="fa-solid fa-house"></i> Menú</button>
+            </div>
+        </header>
+
+        <main class="game-viewport" id="game-viewport">
+            <div id="board-container" class="board-container">
+                <div id="board" class="board"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL FIN DE PARTIDA (VICTORIA / DERROTA) -->
+    <div id="dialog-overlay" class="overlay hidden">
+        <div class="dialog-card" id="dialog-card-box">
+            <div id="dialog-icon-container" class="dialog-icon-container"></div>
+            <h2 id="dialog-title">¡Partida Terminada!</h2>
+            <p id="dialog-message"></p>
+            <div class="dialog-actions">
+                <button id="btn-dialog-restart" class="btn btn-primary animated-btn">Volver a Jugar</button>
+                <button id="btn-dialog-menu" class="btn btn-secondary animated-btn">Menú Principal</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/sound.js"></script>
+    <script src="js/board.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
